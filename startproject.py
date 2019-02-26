@@ -19,6 +19,7 @@ class SqlConnect:
         cursor.execute(use_database)
         cursor.execute(self.create_table_query)
         print("Database Created")
+        print("Table Created in MYSQL")
         
 
 
@@ -55,7 +56,7 @@ CreateTableQry_obj=CreateTableQry()
 CreateTableQry_obj.extractcolumns()
 create_table_qry=CreateTableQry_obj.generateqry()
 
-SqlConnect_obj=SqlConnect("Project",create_table_qry)
+SqlConnect_obj=SqlConnect(db_name,create_table_qry)
 SqlConnect_obj.connect_to_sql()
 
 
