@@ -31,11 +31,13 @@ class Create_Database():
         print(usedb)
         
 class Table_Create():
+    
     def __init__(self,tablename,fname,Start_Connection_Object):
         self.tablename=tablename
         self.fname=fname
         self.rows=[]
         self.res=[]
+        self.n=[]
         self.Start_Connection_Object=Start_Connection_Object
     def tbcreate(self):
         str1="drop table if exists "+self.tablename+";"
@@ -62,47 +64,60 @@ class Table_Create():
     def datatype(self):
         count=1
         with open(self.fname,"r") as file:
-            read=csv.reader(file,delimiter=";")
-            for row in read:
-                if count==1:
-                    count+=1
-                    self.n=[]
-                else:
-                    self.n.append(row)
+           read=csv.reader(file,delimiter=";")
+           for row in read:
+               if count==1:
+                   count+=1
+               else:
+                   self.n.append(row)
+        
         for i in self.n:
-            k=len(i)
-            break
+           k=len(i)
+           break
+        
         i=0
         while(i<k):
-            m1=[]
-            m=0
-            n=0
-            for j in self.n:
-                if re.search("^[0-9]+[.][0-9]+$",j[i]):
-                    l="DECIMAL("
-                    s=str(j[i])
-                    m1=s.split(".")
-                    a1=len(m1[0])
-                    b1=len(m1[1])
-                    a1=a1+b1
-                    if(a1>m):
-                        m=a1
-                    if(b1>=n):
-                        n=b1
-                    l=l+str(m)+","+str(n)+")"
-                elif re.search("^[0-9]+$",j[i]):
-                    l="int"
-                elif re.search("^[0-9]+[-/][0-9]+[-/][0-9]+$",j[i]):
+           m1=[]
+           m=0
+           n=0
+           sl=[]
+           for j in self.n:
+               if re.search("^[0-9]+[.][0-9]+$",j[i]):
+                   l="DECIMAL("
+                   s=str(j[i])
+                   m1=s.split(".")
+                   a1=len(m1[0])
+                   b1=len(m1[1])
+                   a1=a1+b1
+                   if(a1>m):
+                       m=a1
+                   if(b1>=n):
+                       n=b1
+                   l=l+str(m)+","+str(n)+")"
+               elif re.search("^[0-9]+$",j[i]):
+                   l="int"
+               elif re.search("^[0-9]+[-/.][0-9]+[-/.][0-9]+$",j[i]):
+                    j[i]=datetime.strptime(j[i], "%d/%m/%Y").strftime('%Y-%m-%d')
                     l="varchar(20)"
-                elif re.search("^[A-Za-z]+$",j[i]):
-                    o=len(j[i])
-                    if(o>m):
-                        m=o
-                        l="varchar("+str(m)+")"
-                elif time.strptime(j[i], '%H:%M:%S'):
+               elif re.search("^([0-1]*[1-9]|[2][0-4])[:]([0-5]*[0-9]|[6][0])[:]([0-5]*[0-9]|[6][0])$",j[i]):
                     l="varchar(20)"
-            self.res.append(l)
-            i+=1
+               elif re.search("^[A-Za-z0-9]+$",j[i]):
+                   o=len(j[i])
+                   if(o>m):
+                       m=o
+                       l="varchar("+str(m)+")"
+               else:
+                   l="0"
+                   j[i]="0"
+               sl.append(l)
+           for p in range(0,len(sl)):
+               if sl[p]!="0" and sl[p]==sl[p-1]:
+                   l=sl[p]
+                   
+           self.res.append(l)
+           i+=1
+        print(self.res)
+
     
         
 
@@ -129,17 +144,19 @@ class Insert_Data:
                         if count==1:
                             break
                         else:
+                            if j=='':
+                                j='0.000'
                             qry+="\'"+j+"\',"
                             final_qry="("+qry[0:len(qry)-1]+"\"),"
                             final_qry=final_qry[0:len(final_qry)-3]+")"
                     insert_qry+=final_qry+","
                 
-                if(count%10==0 and count>0):
+                if(count%100==0 and count>0):
                     insert_qry=insert_qry[0:len(insert_qry)-2]+")"
                     self.Start_Connection_Object.cursor.execute(insert_qry)
                     insert_qry="insert into "+tname+" values"
                     qry=""
-                    print("Inserting In Batches "+str(count//10))
+                    print("Inserting In Batches "+str(count//100))
                 count+=1
         print("Inserting In Batches "+str(count//10))
         insert_qry=insert_qry[0:len(insert_qry)-2]+")"
@@ -158,7 +175,6 @@ Table_Create_Object.datatype() #Data Types Predicted
 Table_Create_Object.tbcreate() #Table Is Created Finally!! :)
 Insert_Data_Object=Insert_Data(Start_Connection_Object)
 Insert_Data_Object.insertfromcsv()
-
 
 
 
