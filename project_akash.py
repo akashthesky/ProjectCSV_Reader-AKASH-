@@ -116,14 +116,22 @@ class Table_Create():
                    
            self.res.append(l)
            i+=1
-        print(self.res)
+        
+        SetNullValue_object=SetNullValue(self.res)
+        SetNullValue_object.generatedict()
+        
+        
+        #print(self.res)
+    def get_index_column(self,index):
+        return self.res[index]
 
     
         
 
-class Insert_Data:
-    def __init__(self,Start_Connection_Object):
+class Insert_Data():
+    def __init__(self,Start_Connection_Object,Table_Create_Object):
         self.Start_Connection_Object=Start_Connection_Object
+        self.Table_Create_Object=Table_Create_Object
     def insertfromcsv(self):
         usedb="use "+dbname+";"
         self.Start_Connection_Object.cursor.execute(usedb)
@@ -136,6 +144,7 @@ class Insert_Data:
             column_name=[]
             insert_qry="insert into "+tname+" values"
             for i in csv_reader:
+                index=0
                 #print(i)
                 #insert_qry+="("
                 qry=""
@@ -144,11 +153,16 @@ class Insert_Data:
                         if count==1:
                             break
                         else:
-                            if j=='':
-                                j='0.000'
+                            
+                            if (j=='' or j==' '):
+                                key=self.Table_Create_Object.get_index_column(index)
+                                print(key)
+                                j=thisdict[key]
+                            index+=1
                             qry+="\'"+j+"\',"
                             final_qry="("+qry[0:len(qry)-1]+"\"),"
                             final_qry=final_qry[0:len(final_qry)-3]+")"
+                        
                     insert_qry+=final_qry+","
                 
                 if(count%100==0 and count>0):
@@ -166,6 +180,40 @@ class Insert_Data:
         self.Start_Connection_Object.cursor.close()
         #print(insert_qry)
 
+
+class SetNullValue:
+    def __init__(self,res):
+        self.result=res
+    
+    def generatedict(self):
+        for i in self.result:
+            default_value=self.getnullvalue(i)
+            thisdict[i]=default_value
+        print(thisdict)
+    def getnullvalue(self,datatype):
+        i=datatype
+        if (i[0:7]=='varchar'):
+            return 'None'
+        elif (i=='int'):
+            return '0'
+        elif (i[0:7]=='DECIMAL'):
+            p=int(i[8])
+            d=int(i[10])
+            val='0'*(p-d)
+            val=val+'.'+'0'*d
+            return val
+        elif (i=='date'):
+            return '00/00/0000'
+        elif (i=='time'):
+            return '00:00:00'
+        else:
+            return 'None'
+    
+                
+            
+
+
+
 Start_Connection_Object=Start_Connection() #connection started
 Create_Database_Object=Create_Database(dbname,Start_Connection_Object) #Connection Object is passed
 Create_Database_Object.create_db() #Database Created
@@ -173,8 +221,5 @@ Table_Create_Object=Table_Create(tname,filename,Start_Connection_Object)
 Table_Create_Object.extractcol() #Coumn Name Extracted
 Table_Create_Object.datatype() #Data Types Predicted
 Table_Create_Object.tbcreate() #Table Is Created Finally!! :)
-Insert_Data_Object=Insert_Data(Start_Connection_Object)
+Insert_Data_Object=Insert_Data(Start_Connection_Object,Table_Create_Object)
 Insert_Data_Object.insertfromcsv()
-
-
-
