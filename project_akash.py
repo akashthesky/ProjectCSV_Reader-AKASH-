@@ -10,7 +10,7 @@ import re
 
 class Start_Connection:
     def __init__(self):
-        self.db1=MySQLdb.connect("localhost","root","")
+        self.db1=MySQLdb.connect("localhost","root","#infy123")
         self.cursor=self.db1.cursor()
         print (self.db1)
 
@@ -98,7 +98,7 @@ class Table_Create():
                    l="int"
                elif re.search("^[0-9]+[-/.][0-9]+[-/.][0-9]+$",j[i]):
                     j[i]=datetime.strptime(j[i], "%d/%m/%Y").strftime('%Y-%m-%d')
-                    l="varchar(20)"
+                    l="date"
                elif re.search("^([0-1]*[1-9]|[2][0-4])[:]([0-5]*[0-9]|[6][0])[:]([0-5]*[0-9]|[6][0])$",j[i]):
                     l="varchar(20)"
                elif re.search("^[A-Za-z0-9]+$",j[i]):
@@ -153,7 +153,9 @@ class Insert_Data():
                         if count==1:
                             break
                         else:
-                            
+                            mat=re.match('(\d{2})[/.-](\d{2})[/.-](\d{4})$', j)
+                            if mat is not None:
+                                j=datetime.strptime(j, "%d/%m/%Y").strftime('%Y-%m-%d')
                             if (j=='' or j==' '):
                                 key=self.Table_Create_Object.get_index_column(index)
                                 print(key)
