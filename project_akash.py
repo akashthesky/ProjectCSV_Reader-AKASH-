@@ -100,7 +100,7 @@ class Table_Create():
                     j[i]=datetime.strptime(j[i], "%d/%m/%Y").strftime('%Y-%m-%d')
                     l="date"
                elif re.search("^([0-1]*[1-9]|[2][0-4])[:]([0-5]*[0-9]|[6][0])[:]([0-5]*[0-9]|[6][0])$",j[i]):
-                    l="varchar(20)"
+                    l="time"
                elif re.search("^[A-Za-z0-9]+$",j[i]):
                    o=len(j[i])
                    if(o>m):
@@ -153,6 +153,7 @@ class Insert_Data():
                         if count==1:
                             break
                         else:
+                            flag=0
                             mat=re.match('(\d{2})[/.-](\d{2})[/.-](\d{4})$', j)
                             if mat is not None:
                                 j=datetime.strptime(j, "%d/%m/%Y").strftime('%Y-%m-%d')
@@ -160,8 +161,14 @@ class Insert_Data():
                                 key=self.Table_Create_Object.get_index_column(index)
                                 print(key)
                                 j=thisdict[key]
+                                if j=='null':
+                                    flag=1
+                            if flag==1:
+                                qry+=""+j+","
+                            else:
+                                qry+="\'"+j+"\',"
+                                        
                             index+=1
-                            qry+="\'"+j+"\',"
                             final_qry="("+qry[0:len(qry)-1]+"\"),"
                             final_qry=final_qry[0:len(final_qry)-3]+")"
                         
@@ -205,9 +212,9 @@ class SetNullValue:
             val=val+'.'+'0'*d
             return val
         elif (i=='date'):
-            return '00/00/0000'
+            return 'null'
         elif (i=='time'):
-            return '00:00:00'
+            return 'null'
         else:
             return 'None'
     
