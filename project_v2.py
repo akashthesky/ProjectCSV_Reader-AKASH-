@@ -171,12 +171,35 @@ class SetNullValue:
             return 'None'
 
 
-Start_Connection_Object = Start_Connection()  # connection started
-Create_Database_Object = Create_Database(dbname, Start_Connection_Object)  # Connection Object is passed
-Create_Database_Object.create_db()  # Database Created
-Table_Create_Object = Table_Create(tname, filename, Start_Connection_Object)
-Table_Create_Object.extractcol()  # Coumn Name Extracted
-Table_Create_Object.datatype()  # Data Types Predicted
-Table_Create_Object.tbcreate()  # Table Is Created Finally!! :)
-Insert_Data_Object = Insert_Data(Start_Connection_Object, Table_Create_Object)
-Insert_Data_Object.insertfromcsv()
+
+f = open("errorlog.log", "w")
+f.write("Issues :            Time \n")
+
+try:
+    Start_Connection_Object = Start_Connection()  # connection started
+    try:
+        Create_Database_Object = Create_Database(dbname, Start_Connection_Object)  # Connection Object is passed
+        Create_Database_Object.create_db()# Database Created
+        try:
+            Table_Create_Object = Table_Create(tname, filename, Start_Connection_Object)
+            Table_Create_Object.extractcol()  # Coumn Name Extracted
+            Table_Create_Object.datatype()  # Data Types Predicted
+            Table_Create_Object.tbcreate()  # Table Is Created Finally!! :)
+            try:
+                Insert_Data_Object = Insert_Data(Start_Connection_Object, Table_Create_Object)
+                Insert_Data_Object.insertfromcsv()
+            except:
+                f = open("errorlog.log", "a")
+                f.write("Insertion Failed !! " +"\n")
+        except:
+            f = open("errorlog.log", "a")
+            f.write("Table Not Created !! " +"\n")
+    except:
+        f = open("errorlog.log", "a")
+        f.write("Database Not Created !! " +"\n")
+except:
+    f = open("errorlog.log", "a")
+    f.write("Opps There Was a Connection Problem !!" +"\n")
+
+
+
