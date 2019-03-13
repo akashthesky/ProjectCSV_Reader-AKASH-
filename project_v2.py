@@ -126,15 +126,23 @@ class Insert_Data():
                 
                 if(count % 20000 == 0 and count > 0):
                     insert_qry = insert_qry[0:len(insert_qry) - 2] + ")"
-                    self.Start_Connection_Object.cursor.execute(insert_qry)
-                    self.Start_Connection_Object.db1.commit()
+                    try:
+                        self.Start_Connection_Object.cursor.execute(insert_qry)
+                        self.Start_Connection_Object.db1.commit()
+                    except:
+                        f = open("errorlog.log", "a")
+                        f.write("Error in Batch  !! " + count%2000 + "\n")
                     insert_qry = "insert into " + tname + " values"
                     qry = ""
                     print("Inserting In Batches " + str(count // 20000))
                 count += 1
         insert_qry = insert_qry[0:len(insert_qry) - 2] + ")"
-        self.Start_Connection_Object.cursor.execute(insert_qry)
-        self.Start_Connection_Object.db1.commit()
+        try:
+            self.Start_Connection_Object.cursor.execute(insert_qry)
+            self.Start_Connection_Object.db1.commit()
+        except:
+            f = open("errorlog.log", "a")
+            f.write("Error in Batch  !! " + (count%2000)+1 + "\n")
         print("Insert Finished")
         self.Start_Connection_Object.cursor.close()
         # print(insert_qry)
