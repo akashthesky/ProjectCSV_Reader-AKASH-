@@ -4,13 +4,14 @@ Created on Mar 12, 2019
 @author: akash18.TRN
 '''
 dbname="Hello"
-tname="employee"
-filename="data2.txt"
+tname="employee2"
+filename="data.txt"
 primarykey_col=-1
 thisdict={
     
 };
-
+batch_size=10
+deli=';'
 datatype_dict={
     1: "date",
     2: "time",
