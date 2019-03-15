@@ -3,6 +3,7 @@ Created on Mar 12, 2019
 
 @author: akash18.TRN
 '''
+author='Akash'
 dbname="Hello"
 tname="employee2"
 filename="data.txt"
