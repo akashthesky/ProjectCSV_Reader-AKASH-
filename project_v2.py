@@ -192,6 +192,23 @@ class SetNullValue:
         else:
             return 'None'
 
+class Add_auditcolumn:
+    def __init__(self):
+        db2 = MySQLdb.connect("localhost", "root", "#infy123")
+        cursor = db2.cursor()
+        usedb = "use " + dbname + ";"
+        cursor.execute(usedb)
+        addcolumnqry1="ALTER TABLE "+tname+" ADD Created_By varchar(20) DEFAULT '"+author+"';"
+        addcolumnqry2="ALTER TABLE "+tname+" ADD Created_time datetime DEFAULT NOW();"
+        addcolumnqry3="ALTER TABLE "+tname+" ADD Updated_By varchar(20) DEFAULT null;"
+        addcolumnqry4="ALTER TABLE "+tname+" ADD Updated_time datetime DEFAULT null;"
+        cursor.execute(addcolumnqry1)
+        cursor.execute(addcolumnqry2)
+        cursor.execute(addcolumnqry3)
+        cursor.execute(addcolumnqry4)
+        db2.commit()
+        print("Done")
+
 
 print("***PROJECT MENU***\n")
 print("1: CSV With Coulmn Name\n")
@@ -218,9 +235,11 @@ try:
             Table_Create_Object.extractcol()  # Coumn Name Extracted
             Table_Create_Object.datatype()  # Data Types Predicted
             Table_Create_Object.tbcreate()  # Table Is Created Finally!! :)
+            
             try:
                 Insert_Data_Object = Insert_Data(Start_Connection_Object, Table_Create_Object)
                 Insert_Data_Object.insertfromcsv()
+                Add_auditcolumn_Object=Add_auditcolumn()
             except:
                 f = open("errorlog.log", "a")
                 f.write("Insertion Failed !! " +"\n")
